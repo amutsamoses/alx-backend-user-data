@@ -96,3 +96,41 @@ class DB:
             raise NoResultFount("No user Found")
 
         return user
+
+    def update_user(self, user_id: int, **kwargs) -> None:
+        """
+        update the user's attribute
+
+        Args:
+            user_id: the ID of the user to update (integer)
+            **kwargs: arguments representing the attributes to update.
+
+        Raises:
+            ValueError: argument not correspond to a user attribute
+
+        Return:
+            None
+
+        """
+
+        try:
+            '#find user by ID'
+            user = self.find_user_by(id=user_id)
+
+            '#update user attributes'
+            for key, value in kwargs.items():
+                if not hasattr(User, key):
+                    raise ValueError(f"Invalid attribute: {key}")
+                setattr(user, key, value)
+
+            '#commit the changes to the database'
+            self._session.commit()
+
+        except NoResultFound:
+            print(f"User with id {user_id} not found.")
+            raise
+
+        except Exception as e:
+            self._session.rollback()
+            print(f"Error updating user: {e}")
+            raise
